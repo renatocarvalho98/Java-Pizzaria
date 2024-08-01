@@ -1,8 +1,11 @@
 package JavaPizzaria;
 
+import JavaPizzaria.DataBaseOperations.DAO.CustomerDAO;
 import JavaPizzaria.DataBaseOperations.DBsetup.SetUpDB;
+import JavaPizzaria.PizzaSetting.Customer.Customer;
 import JavaPizzaria.PizzaSetting.PizzaDetails.Pizza;
 
+import java.sql.SQLException;
 //import java.sql.DriverManager;
 //import java.sql.PreparedStatement;
 //import java.sql.SQLException;
@@ -11,17 +14,120 @@ import java.util.List;
 import java.util.Scanner;
 
 
+
+
 public class mainpizza {
+
+    static CustomerDAO customerDAO = new CustomerDAO();
+    static Customer currentCustomer = null;
+
+
     public static void main(String[] args) {
 
     Scanner scanner = new Scanner(System.in);
     List<Pizza> orderList = new ArrayList<>();
 
+    //Show initial Menu
     System.out.println("----Welcome Pizzaria RenatoKings----" +
                         "\nWe have Peperroni, Margarita, Chicken and Mussarela"+
                         "\nSmall size 12$ // Medium size 16$ // Large size 18$"+
                         "\nEach Topping add 2$");
 
+                        
+    //Here we gonna setup the adress and Login, if the user dont wanna setup costumer_ID it goes to 01 ID - noLogin
+    boolean exit = false;
+    while (!exit) {
+        System.out.println("You would like to login press - 1 // Creat your new login press - 2 // Without login press - 3 ");
+        int optLogin = scanner.nextInt();
+        scanner.nextLine(); // Consume the newline
+    
+
+
+    switch (optLogin) {
+
+        case 1:
+        boolean loginSuccess = false;
+        while (!loginSuccess) {
+                System.out.println("Please type your login: ");
+                String checkLogin = scanner.nextLine();
+                System.out.println("Please type your password: ");
+                String checkPassword = scanner.nextLine();
+
+                    int userID = CustomerDAO.checkLogin(checkLogin, checkPassword);
+                    if (userID != -1) {
+                        System.out.println("Login successful.");
+                        List<Customer> customers = customerDAO.selectAllCustomers();
+                        for (Customer customer : customers) {
+                            if (customer.getCustomerId() == userID) {
+                                currentCustomer = customer;
+                                break;
+                                }
+                            }
+                            loginSuccess = true;
+                        } else {
+                            System.out.println("Invalid login or password. Would you like to try again or go back to the main menu? (try again/back)");
+                            String retryOption = scanner.nextLine();
+                            if (retryOption.equalsIgnoreCase("back")) {
+                                break;
+                            }
+                        }
+                    }
+                    break;
+
+        case 2:
+        boolean accountCreated = false;
+        while (!accountCreated) {
+                    System.out.println("Please type your name: ");
+                    String nameAccount = scanner.nextLine();
+                    System.out.println("Please type your login: ");
+                    String nameLogin = scanner.nextLine();
+                    System.out.println("Please type your password: ");
+                    String passwordLogin = scanner.nextLine();
+                    System.out.println("Please type your address: ");
+                    String addressLogin = scanner.nextLine();
+
+                        if (customerDAO.checkLogin(nameLogin, passwordLogin) == -1) {
+                            currentCustomer = new Customer(nameAccount, nameLogin, passwordLogin, addressLogin);
+                            try {
+                                customerDAO.insertCustomer(currentCustomer);
+                                System.out.println("Account created successfully.");
+                                accountCreated = true;
+                            } catch (SQLException e) {
+                                e.printStackTrace();
+                                System.out.println("Error creating account.");
+                            }
+                        } else {
+                            System.out.println("Login already in use. Please choose another login. Would you like to go back to the main menu? (yes/no)");
+                            String retryOption = scanner.nextLine();
+                            if (retryOption.equalsIgnoreCase("yes")) {
+                                break;
+                            }
+                        }
+                    }
+                    break;
+        
+        case 3:
+        System.out.println("Please type your name: ");
+                String nameLoginEmpty = scanner.nextLine();
+                System.out.println("Please type your address: ");
+                String addressLoginEmpty = scanner.nextLine();
+
+                currentCustomer = new Customer(nameLoginEmpty, "noLogin", "noPassword", addressLoginEmpty);
+                exit = true; // Exit after choosing this option
+                break;
+
+
+        default:
+                    System.out.println("Invalid input.");
+                    break;
+    
+     }
+ 
+        }
+                      
+        
+        
+/* 
                         try {
                             if (SetUpDB.setupDBDetails()) {
                                 System.out.println("Database login and table created");
@@ -32,7 +138,7 @@ public class mainpizza {
                             e.printStackTrace();
                         }
 
-
+*/
 
     while (true) {
 
@@ -80,6 +186,8 @@ public class mainpizza {
                 break;
             }
         }
+
+
 
         //put it at List 
         orderList.add(pizza);
