@@ -1,18 +1,36 @@
+package JavaPizzaria;
 
+import JavaPizzaria.DataBaseOperations.DBsetup.SetUpDB;
+import JavaPizzaria.PizzaSetting.PizzaDetails.Pizza;
+
+//import java.sql.DriverManager;
+//import java.sql.PreparedStatement;
+//import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Scanner;
+
 
 public class mainpizza {
     public static void main(String[] args) {
 
     Scanner scanner = new Scanner(System.in);
-    List<pizza> orderList = new ArrayList<>();
+    List<Pizza> orderList = new ArrayList<>();
 
     System.out.println("----Welcome Pizzaria RenatoKings----" +
                         "\nWe have Peperroni, Margarita, Chicken and Mussarela"+
                         "\nSmall size 12$ // Medium size 16$ // Large size 18$"+
                         "\nEach Topping add 2$");
+
+                        try {
+                            if (SetUpDB.setupDBDetails()) {
+                                System.out.println("Database login and table created");
+                            } else {
+                                System.out.println("Oh no! There was a database creation problem...");
+                            }
+                        } catch (Exception e) {
+                            e.printStackTrace();
+                        }
 
 
 
@@ -48,37 +66,31 @@ public class mainpizza {
 
 
         //Creat order to pizza    
-        pizza pizza = new pizza(flavourString, qnty, size);
+        Pizza pizza = new Pizza(flavourString, qnty, size);
 
 
-        //Check to customer about toppings
-        System.out.println("Would like to add CHEESE topping?(Yes/No) ");
-        String cheeeseCheck = scanner.nextLine();
-
-        if (cheeeseCheck.equalsIgnoreCase("yes")) {
-            pizza.addChese();
-            
-        }
-
-        System.out.println("Would like to add MUSHROOM topping?(Yes/No) ");
-        String mushroomCheck = scanner.nextLine();
-
-        if (mushroomCheck.equalsIgnoreCase("yes")) {
-            pizza.addMushroom();
-            
+        while (true) {
+            System.out.println("Would you like to add a topping? (Yes/No)");
+            String toppingCheck = scanner.nextLine();
+            if (toppingCheck.equalsIgnoreCase("yes")) {
+                System.out.println("Enter topping name:");
+                String topping = scanner.nextLine();
+                pizza.addTopping(topping);
+            } else {
+                break;
+            }
         }
 
         //put it at List 
         orderList.add(pizza);
-        pizza.displayDetails();
+        
+        
 
         System.out.println("Would like to add new pizza to order? (Yes/No)");
         String morePizzaCheck = scanner.nextLine();
 
         if (morePizzaCheck.equalsIgnoreCase("no")) {
             System.out.println();
-            pizza.preparing();
-            pizza.eating();
             System.out.println();
             break;            
         }
@@ -89,16 +101,17 @@ public class mainpizza {
 
         //checking list and make price
         double totalPrice = 0;
-        for (pizza pizz : orderList) {
-            totalPrice += pizz.getPricePizza();
+        for (Pizza pizz : orderList) {
+            totalPrice += pizz.getPrice();
             
         }
 
+      
         //display total 
 
         System.out.println("Your order was : ");
         
-        for (pizza pizzaListFinal : orderList) {
+        for (Pizza pizzaListFinal : orderList) {
               System.out.println(pizzaListFinal + "\n");  
         }
 
@@ -106,14 +119,8 @@ public class mainpizza {
        System.out.println("Total $ " + totalPrice);
         scanner.close();
 
-
-
-
-
-      
-                        
-
     }
+
 
     
 }
