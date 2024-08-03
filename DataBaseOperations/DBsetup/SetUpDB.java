@@ -36,7 +36,8 @@ public class SetUpDB extends DataBadeDetails {
            // Ensure the Sales table exists
            String createSalesTable = 
                "CREATE TABLE IF NOT EXISTS Sales (" +
-               "sale_id INT PRIMARY KEY AUTO_INCREMENT, " +
+               "line_item_id INT AUTO_INCREMENT PRIMARY KEY, " +
+               "sale_id INT, " +
                "customer_id INT, " +
                "pizza_flavor VARCHAR(255), " +
                "size VARCHAR(50), " +
@@ -44,6 +45,7 @@ public class SetUpDB extends DataBadeDetails {
                "toppings VARCHAR(255), " +
                "price DOUBLE, " +
                "comments VARCHAR(255), " +
+               "PRIMARY KEY (sale_id, customer_id), " +
                "FOREIGN KEY (customer_id) REFERENCES Customers(customer_id)" +
                ");";
            stmt.execute(createSalesTable);

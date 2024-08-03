@@ -1,7 +1,9 @@
 package JavaPizzaria;
 
 import JavaPizzaria.DataBaseOperations.DAO.CustomerDAO;
+import JavaPizzaria.DataBaseOperations.DAO.PizzaDAO;
 import JavaPizzaria.DataBaseOperations.DBsetup.SetUpDB;
+import JavaPizzaria.DataBaseOperations.Service.PizzaService;
 import JavaPizzaria.PizzaSetting.Customer.Customer;
 import JavaPizzaria.PizzaSetting.PizzaDetails.Pizza;
 
@@ -20,12 +22,16 @@ public class mainpizza {
 
     static CustomerDAO customerDAO = new CustomerDAO();
     static Customer currentCustomer = null;
-
-
-    public static void main(String[] args) {
+    static PizzaService pizzaService = new PizzaService();
+    
+ 
+    public static void main(String[] args) throws SQLException {
 
     Scanner scanner = new Scanner(System.in);
     List<Pizza> orderList = new ArrayList<>();
+    
+    int currentIDSales = PizzaDAO.getCurrentMaxSalesId() +1;
+  
 
     //Show initial Menu
     System.out.println("----Welcome Pizzaria RenatoKings----" +
@@ -72,6 +78,7 @@ public class mainpizza {
                             }
                         }
                     }
+                    exit = true;
                     break;
 
         case 2:
@@ -104,6 +111,7 @@ public class mainpizza {
                             }
                         }
                     }
+                    exit = true;
                     break;
         
         case 3:
@@ -112,8 +120,9 @@ public class mainpizza {
                 System.out.println("Please type your address: ");
                 String addressLoginEmpty = scanner.nextLine();
 
-                currentCustomer = new Customer(nameLoginEmpty, "noLogin", "noPassword", addressLoginEmpty);
+                currentCustomer = new Customer(9999,nameLoginEmpty, "noLogin", "noPassword", addressLoginEmpty);
                 exit = true; // Exit after choosing this option
+                exit = true;
                 break;
 
 
@@ -124,24 +133,22 @@ public class mainpizza {
      }
  
         }
-                      
-        
-        
-/* 
-                        try {
-                            if (SetUpDB.setupDBDetails()) {
-                                System.out.println("Database login and table created");
-                            } else {
-                                System.out.println("Oh no! There was a database creation problem...");
-                            }
-                        } catch (Exception e) {
-                            e.printStackTrace();
-                        }
 
-*/
+
+       
+                      
+        int currentSalesId = 0;
+        try {
+            currentSalesId = PizzaDAO.getCurrentMaxSalesId() + 1;
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
 
     while (true) {
 
+
+
+        //flavor
         String flavourString;
         while (true) {
             System.out.println("Tell us which pizza you would like to order ?" +
@@ -154,6 +161,8 @@ public class mainpizza {
             }
         }
 
+
+        //size
         String size;
         while (true) {
             System.out.println("Excellent! Now tell us the size:  Small / Medium / Large ");
@@ -171,10 +180,19 @@ public class mainpizza {
         scanner.nextLine();
 
 
+
+ 
         //Creat order to pizza    
         Pizza pizza = new Pizza(flavourString, qnty, size);
+        pizza.setCustomerId(currentCustomer.getCustomerId());
+        pizza.setId(currentSalesId);
+       
+        
+        pizza.calculatePrice();
 
 
+
+        //toppings
         while (true) {
             System.out.println("Would you like to add a topping? (Yes/No)");
             String toppingCheck = scanner.nextLine();
@@ -186,23 +204,31 @@ public class mainpizza {
                 break;
             }
         }
+       
+        
 
-
-
-        //put it at List 
+        System.out.println("Any comments for your order?");
+        String comments = scanner.nextLine();
+        pizza.setComments(comments);
         orderList.add(pizza);
-        
-        
+        pizzaService.addPizza(pizza);
+
 
         System.out.println("Would like to add new pizza to order? (Yes/No)");
         String morePizzaCheck = scanner.nextLine();
+    
 
         if (morePizzaCheck.equalsIgnoreCase("no")) {
+            
             System.out.println();
             System.out.println();
+
             break;            
         }
+       
 
+
+        
         }  
 
 
@@ -211,8 +237,8 @@ public class mainpizza {
         double totalPrice = 0;
         for (Pizza pizz : orderList) {
             totalPrice += pizz.getPrice();
-            
-        }
+        
+       }
 
       
         //display total 
@@ -225,9 +251,13 @@ public class mainpizza {
 
 
        System.out.println("Total $ " + totalPrice);
-        scanner.close();
+       scanner.close();
+
+       
 
     }
+
+    
 
 
     

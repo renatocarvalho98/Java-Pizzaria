@@ -25,4 +25,6 @@ public class PizzaService {
     public List<Pizza> getAllPizzas() {
         return pizzaDAO.selectAllPizzas();
     }
+
+    
 }

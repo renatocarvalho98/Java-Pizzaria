@@ -4,6 +4,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 public class Pizza {
+    private int lineItemId;
     private int id;
     private int customerId;
     private String flavor;
@@ -14,7 +15,8 @@ public class Pizza {
     private String comments;
 
     // Construtor para criar uma pizza com todos os atributos
-    public Pizza(int id, int customerId, String flavor, String size, int quantity, String toppings, double price, String comments) {
+    public Pizza(int lineItemId, int id, int customerId, String flavor, String size, int quantity, String toppings, double price, String comments) {
+        this.lineItemId = lineItemId;
         this.id = id;
         this.customerId = customerId;
         this.flavor = flavor;
@@ -30,9 +32,17 @@ public class Pizza {
 
     // Construtor simplificado
     public Pizza(String flavor, int quantity, String size) {
-        this(0, 0, flavor, size, quantity, "", 0, "");
+        this(0, 0, 0, flavor, size, quantity, "", 0, "");
     }
 
+
+    public int getLineItemId() {
+        return lineItemId;
+    }
+
+    public void setLineItemId(int lineItemId) {
+        this.lineItemId = lineItemId;
+    }
     // Métodos de acesso e mutação
     public int getId() {
         return id;

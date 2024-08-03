@@ -14,6 +14,8 @@ import java.util.List;
 public class CustomerDAO extends DataBadeDetails {
     private static final String INSERT_CUSTOMER_SQL = "INSERT INTO Customers (name, login, password, delivery_address) VALUES (?, ?, ?, ?)";
     private static final String SELECT_ALL_CUSTOMERS = "SELECT * FROM Customers";
+    private static final String CHECK_LOGIN_SQL = "SELECT customer_id FROM Customers WHERE login = ? AND password = ?";
+    private static final String GET_CUSTOMER_ID_BY_LOGIN = "SELECT customer_id FROM Customers WHERE login = ?";
 
 
     //Insert new user at dataBase
@@ -55,10 +57,10 @@ public class CustomerDAO extends DataBadeDetails {
     //CHECK LOGIN IN DATA BASE
     public static int checkLogin(String login, String password) {
         try (Connection conn = DriverManager.getConnection(DB_URL, USER, PASSWORD);
-            Statement stmt = conn.createStatement()) {
-            String sql = String.format("SELECT customer_id FROM %s WHERE login = '%s' AND password = '%s';", TABLE_NAME2, login, password);
-            ResultSet resultSet = stmt.executeQuery(sql);
-    
+        PreparedStatement pstmt = conn.prepareStatement(CHECK_LOGIN_SQL)) {
+       pstmt.setString(1, login);
+       pstmt.setString(2, password);
+       ResultSet resultSet = pstmt.executeQuery();
             if (resultSet.next()) {
                 // Return the user_id if the login and password are valid
                 return resultSet.getInt("customer_id");
@@ -74,4 +76,25 @@ public class CustomerDAO extends DataBadeDetails {
       
       
         }
+
+
+
+
+    //Get customer ID by login
+    public int getCustomerIdByLogin(String login) {
+        try (Connection conn = DriverManager.getConnection(DB_URL, USER, PASSWORD);
+             PreparedStatement preparedStatement = conn.prepareStatement(GET_CUSTOMER_ID_BY_LOGIN)) {
+            preparedStatement.setString(1, login);
+            ResultSet resultSet = preparedStatement.executeQuery();
+
+            if (resultSet.next()) {
+                return resultSet.getInt("customer_id");
+            }
+        } catch (Exception e) {
+            e.printStackTrace();
+            System.err.println("Error fetching customer ID by login.");
+        }
+
+        return -1;
+    }
 }
