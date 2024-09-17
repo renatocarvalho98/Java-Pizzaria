@@ -31,6 +31,7 @@ public class mainpizza {
     List<Pizza> orderList = new ArrayList<>();
     
     int currentIDSales = PizzaDAO.getCurrentMaxSalesId() +1;
+    int checkLoginAfterCreat = 0;
   
 
     //Show initial Menu
@@ -99,6 +100,7 @@ public class mainpizza {
                                 customerDAO.insertCustomer(currentCustomer);
                                 System.out.println("Account created successfully.");
                                 accountCreated = true;
+                                checkLoginAfterCreat = 1;
                             } catch (SQLException e) {
                                 e.printStackTrace();
                                 System.out.println("Error creating account.");
@@ -133,16 +135,56 @@ public class mainpizza {
      }
  
         }
-
-
-       
-                      
+     
         int currentSalesId = 0;
         try {
             currentSalesId = PizzaDAO.getCurrentMaxSalesId() + 1;
         } catch (SQLException e) {
             e.printStackTrace();
         }
+
+
+
+        boolean exit2 = false;
+        while (!exit2) {
+
+            if (checkLoginAfterCreat == 1) {
+                boolean loginSuccess = false;
+            while (!loginSuccess) {
+                System.out.println("Please type your login: ");
+                String checkLogin = scanner.nextLine();
+                System.out.println("Please type your password: ");
+                String checkPassword = scanner.nextLine();
+
+                    int userID = CustomerDAO.checkLogin(checkLogin, checkPassword);
+                    if (userID != -1) {
+                        System.out.println("Login successful.");
+                        List<Customer> customers = customerDAO.selectAllCustomers();
+                        for (Customer customer : customers) {
+                            if (customer.getCustomerId() == userID) {
+                                currentCustomer = customer;
+                                break;
+                                }
+                            }
+                            loginSuccess = true;
+                        } else {
+                            System.out.println("Invalid login or password. Would you like to try again or go back to the main menu? (try again/back)");
+                            String retryOption = scanner.nextLine();
+                            if (retryOption.equalsIgnoreCase("back")) {
+                                break;
+                            }
+                        }
+                    }
+                    exit2 = true;
+                    break;
+
+            } else {
+                exit2 = true;
+                    break;
+
+            }
+        }
+
 
     while (true) {
 
