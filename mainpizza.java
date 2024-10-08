@@ -1,5 +1,6 @@
 package JavaPizzaria;
 
+
 import JavaPizzaria.DataBaseOperations.DAO.CustomerDAO;
 import JavaPizzaria.DataBaseOperations.DAO.PizzaDAO;
 import JavaPizzaria.DataBaseOperations.DBsetup.SetUpDB;
@@ -267,12 +268,8 @@ public class mainpizza {
 
             break;            
         }
-       
-
-
-        
+    
         }  
-
 
 
         //checking list and make price
